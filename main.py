@@ -40,7 +40,9 @@ def organize_zig_record(data_as_dict_list):
     person_info_list = list()
     for person_info in data_as_dict_list[1:]:
         person_zig_record = ZigRecord(person_info['id'], 
-                                      *person_info['position_head'],
+                                      person_info['position_head'][0],
+                                      person_info['position_head'][2], # z in zig, depth
+                                      person_info['position_head'][1], # y in zig, vertical
                                       *person_info["yaw/pitch"],
                                       person_info["r_distance"],
                                      )
