@@ -72,7 +72,7 @@ def main():
         button_press_count = 0
         button_release_count = 0
 
-        with open(csv_file_name, 'w') as csv_file:
+        with open(csv_file_name, 'w', newline='') as csv_file:
 
             csv_writer = csv.writer(csv_file)
 
