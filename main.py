@@ -75,7 +75,7 @@ def main():
                             'Zig 2 Yaw', 'Zig 2 Pitch', 'Zig 2 Distance',
                             ])
 
-        with open(experiment_file, 'r') as f:
+        with open(experiment_file, 'r', encoding='utf-8') as f:
             for i, line in enumerate(f):
 
                 split_index = line.rfind(']') + 1
