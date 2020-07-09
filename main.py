@@ -53,62 +53,68 @@ def organize_zig_record(data_as_dict_list):
 def main():
 
     experiment_files = [file for file in glob('*.txt') if 'exp' in file]
-    
-    experiment_file = experiment_files[0]
-    
-    csv_file_name = experiment_file.replace('.txt', '.csv')
-    
-    recording_start_time = None
+	
+    print('Files: ', experiment_files)   
+ 
+    # experiment_file = experiment_files[0]
 
-    with open(csv_file_name, 'w') as csv_file:
+    for experiment_file in experiment_files:
 
-        csv_writer = csv.writer(csv_file)
+        csv_file_name = experiment_file.replace('.txt', '.csv')
 
-        csv_writer.writerow(['Current Time', 'Relative Time', 'Button Pushed',
-                            'Zig ID', 'Zig X', 'Zig Y', 'Zig Z', 
-                            'Zig Qw', 'Zig Qx', 'Zig Qy', 'Zig Qz',
-                            'P1 ID', 'P1 X', 'P1 Y', 'P1 Z', 
-                            'P1 Qw', 'P1 Qx', 'P1 Qy', 'P1 Qz',
-                            'P2 ID', 'P2 X', 'P2 Y', 'P2 Z', 
-                            'P2 Qw', 'P2 Qx', 'P2 Qy', 'P2 Qz',
-                            'Zig 1 ID', 'Zig 1 X', 'Zig 1 Y', 'Zig 1 Z', 
-                            'Zig 1 Yaw', 'Zig 1 Pitch', 'Zig 1 Distance',
-                            'Zig 2 ID', 'Zig 2 X', 'Zig 2 Y', 'Zig 2 Z', 
-                            'Zig 2 Yaw', 'Zig 2 Pitch', 'Zig 2 Distance',
-                            ])
+        print('Processing: ', experiment_file, ' => ', csv_file_name)
+        
+        recording_start_time = None
 
-        with open(experiment_file, 'r', encoding='utf-8') as f:
-            for i, line in enumerate(f):
+        with open(csv_file_name, 'w') as csv_file:
 
-                split_index = line.rfind(']') + 1
+            csv_writer = csv.writer(csv_file)
 
-                optitrack_record = line[split_index:].strip().split('\t')
+            csv_writer.writerow(['Current Time', 'Relative Time', 'Button Pushed',
+                                'Zig ID', 'Zig X', 'Zig Y', 'Zig Z', 
+                                'Zig Qw', 'Zig Qx', 'Zig Qy', 'Zig Qz',
+                                'P1 ID', 'P1 X', 'P1 Y', 'P1 Z', 
+                                'P1 Qw', 'P1 Qx', 'P1 Qy', 'P1 Qz',
+                                'P2 ID', 'P2 X', 'P2 Y', 'P2 Z', 
+                                'P2 Qw', 'P2 Qx', 'P2 Qy', 'P2 Qz',
+                                'Zig 1 ID', 'Zig 1 X', 'Zig 1 Y', 'Zig 1 Z', 
+                                'Zig 1 Yaw', 'Zig 1 Pitch', 'Zig 1 Distance',
+                                'Zig 2 ID', 'Zig 2 X', 'Zig 2 Y', 'Zig 2 Z', 
+                                'Zig 2 Yaw', 'Zig 2 Pitch', 'Zig 2 Distance',
+                                ])
 
-                button_pushed, zig_opti_record, p1_opti_record, p2_opti_record = organize_opti_record(optitrack_record)
+            with open(experiment_file, 'r', encoding='utf-8') as f:
+                for i, line in enumerate(f):
 
-                zig_text = line[:split_index]
-                zig_record = json.loads(zig_text)
+                    split_index = line.rfind(']') + 1
 
-                current_time, zig_person_info_list = organize_zig_record(zig_record)
+                    optitrack_record = line[split_index:].strip().split('\t')
 
-                if i == 0:
-                    recording_start_time = current_time
+                    button_pushed, zig_opti_record, p1_opti_record, p2_opti_record = organize_opti_record(optitrack_record)
 
-                relative_time = current_time - recording_start_time
+                    zig_text = line[:split_index]
+                    zig_record = json.loads(zig_text)
 
-                csv_record = [current_time, relative_time, button_pushed]
+                    current_time, zig_person_info_list = organize_zig_record(zig_record)
 
-                csv_record.extend([*zig_opti_record])
-                csv_record.extend([*p1_opti_record])
-                csv_record.extend([*p2_opti_record])
+                    if i == 0:
+                        recording_start_time = current_time
 
-                for zig_person_info in zig_person_info_list:
-                    csv_record.extend([*zig_person_info])
+                    relative_time = current_time - recording_start_time
 
-                if '*' not in zig_text: 
-                    csv_writer.writerow(csv_record)
-                else:
-                    csv_writer.writerow(zig_text)
+                    csv_record = [current_time, relative_time, button_pushed]
+
+                    csv_record.extend([*zig_opti_record])
+                    csv_record.extend([*p1_opti_record])
+                    csv_record.extend([*p2_opti_record])
+
+                    for zig_person_info in zig_person_info_list:
+                        csv_record.extend([*zig_person_info])
+
+                    if '*' not in zig_text: 
+                        csv_writer.writerow(csv_record)
+                    else:
+                        csv_writer.writerow(zig_text)
 
 if __name__ == '__main__':
     main()
