@@ -10,7 +10,7 @@ ZigRecord = namedtuple('zig_record', ('id', 'x', 'y', 'z', 'yaw', 'pitch', 'dist
 
 def organize_opti_record(data_as_list):
     
-    assert len(data_as_list) == 25, f'Length of Optitrack Record is Not 25, {len(data_as_list)}'
+    assert len(data_as_list) == 25, f'Length of Optitrack Record is Not 25, {len(data_as_list)}' + f'{data_as_list}'
     
     button_pushed = bool(int(float(data_as_list[0])))
     
@@ -52,7 +52,8 @@ def organize_zig_record(data_as_dict_list):
 
 def main():
 
-    experiment_files = [file for file in glob('*.txt') if 'exp' in file]
+    # experiment_files = [file for file in glob('*.txt') if 'exp' in file] # only if 'exp' included in a file name
+    experiment_files = [file for file in glob('*.txt')]
 	
     print('Files: ', experiment_files)   
  
@@ -65,6 +66,11 @@ def main():
         print('Processing: ', experiment_file, ' => ', csv_file_name)
         
         recording_start_time = None
+
+        button_was_pushed = None
+
+        button_press_count = 0
+        button_release_count = 0
 
         with open(csv_file_name, 'w') as csv_file:
 
@@ -90,7 +96,25 @@ def main():
 
                     optitrack_record = line[split_index:].strip().split('\t')
 
+                    if '*' in line: # Sound Event!
+                        event_report = optitrack_record[0]
+                        csv_writer.writerow([event_report])
+                        continue
+                        # optitrack_record = optitrack_record[1:]
+
+
                     button_pushed, zig_opti_record, p1_opti_record, p2_opti_record = organize_opti_record(optitrack_record)
+
+                    if button_was_pushed is not None:
+                        if button_was_pushed and not button_pushed:
+                            button_release_count += 1
+                            csv_writer.writerow([f' * Button Released! # {button_release_count:02d}'])
+
+                        if not button_was_pushed and button_pushed:
+                            button_press_count += 1
+                            csv_writer.writerow([f' * Button Pressed! #{button_press_count:02d}'])
+                            
+                    button_was_pushed = button_pushed
 
                     zig_text = line[:split_index]
                     zig_record = json.loads(zig_text)
@@ -111,10 +135,9 @@ def main():
                     for zig_person_info in zig_person_info_list:
                         csv_record.extend([*zig_person_info])
 
-                    if '*' not in zig_text: 
-                        csv_writer.writerow(csv_record)
-                    else:
-                        csv_writer.writerow(zig_text)
+                    # if '*' not in zig_text: 
+                    csv_writer.writerow(csv_record)
+                        
 
 if __name__ == '__main__':
     main()
