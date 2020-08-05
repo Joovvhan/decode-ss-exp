@@ -34,3 +34,16 @@ Sound event form Person ID 3 (Zig)
 - [x] Check sound event does not cause any decoding errors.
 
 - [x] Add line breaking when a button event occurs.
+
+
+### Discussion
+
+- [ ] Git push current code into the Gitlab server.
+
+- [ ] Check decision sampling rate (10Hz?).
+
+- [ ] Check whether the coordinate is left handed frame or right handed.
+
+- [ ] Check how Labview messages are written.
+
+- [ ] Add another time stamp based on Labview local time.
